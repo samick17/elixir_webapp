@@ -1,14 +1,13 @@
 defmodule ElixirWebappWeb.PageController do
   use ElixirWebappWeb, :controller
 
-  def index(conn, params) do
-    IO.inspect(params)
+  def index(conn, _params) do
     conn
     |> render("index.html")
     |> halt()
   end
 
-  def file_not_found(conn, params) do
+  def file_not_found(conn, _params) do
     conn
     |> render("page_not_found.html")
     |> halt()
