@@ -20,18 +20,27 @@ defmodule ElixirWebappWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug ElixirWebappWeb.Plugs.Session
+  end
+
+  pipeline :admins_only do
+    plug :admin_basic_auth
+  end
+
   pipeline :static do
     plug Plug.Static,
       at: "/",
       from: {:elixir_webapp, "priv/static"}
   end
 
-  if Mix.env() in [:dev, :test] do
-    import Phoenix.LiveDashboard.Router
-
-    scope "/" do
-      pipe_through :browser_safe
-      live_dashboard "/dashboard", metrics: ElixirWebappWeb.Telemetry
+  defp admin_basic_auth(conn, _opts) do
+    username = System.get_env("AUTH_USERNAME", "")
+    password = System.get_env("AUTH_PASSWORD", "")
+    if username == "" and password == "" do
+      redirect(conn, to: "/notfound")
+    else
+      Plug.BasicAuth.basic_auth(conn, username: username, password: password)
     end
   end
 
@@ -40,13 +49,23 @@ defmodule ElixirWebappWeb.Router do
   end
 
   scope "/", ElixirWebappWeb do
+    pipe_through [:browser_safe, :admins_only]
+    live_dashboard "/dashboard", metrics: Telemetry
+  end
+
+  scope "/", ElixirWebappWeb do
     pipe_through [:browser]
 
-    get "/", PageController, :index
+    get "/about", PageController, :index
 
     scope "/" do
       pipe_through :static
-      get "/*path", PageController, :file_not_found
+      get "/", PageController, :serve_index
+      get "/index", PageController, :serve_index
+      get "/*path", PageController, :page_not_found
+      post "/*path", PageController, :page_not_found
+      put "/*path", PageController, :page_not_found
+      delete "/*path", PageController, :page_not_found
     end
   end
 end

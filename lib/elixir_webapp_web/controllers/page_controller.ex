@@ -7,9 +7,14 @@ defmodule ElixirWebappWeb.PageController do
     |> halt()
   end
 
-  def file_not_found(conn, _params) do
+  def page_not_found(conn, _params) do
     conn
     |> render("page_not_found.html")
     |> halt()
+  end
+
+  def serve_index(conn, _params) do
+    conn
+    |> redirect(to: "/index.html")
   end
 end

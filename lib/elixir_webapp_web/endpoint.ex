@@ -1,15 +1,9 @@
 defmodule ElixirWebappWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :elixir_webapp
   alias ElixirWebappWeb.Cors
+  alias ElixirWebappWeb.Plugs.CustomSession
 
-  # The session will be stored in the cookie and signed,
-  # this means its contents can be read but not tampered with.
-  # Set :encryption_salt if you would also like to encrypt it.
-  @session_options [
-    store: :cookie,
-    key: "_elixir_webapp_key",
-    signing_salt: "7nSWozKp"
-  ]
+  @session_options Application.get_env(:elixir_webapp, :session)
 
   socket "/socket", ElixirWebappWeb.UserSocket,
     websocket: true,
@@ -49,7 +43,7 @@ defmodule ElixirWebappWeb.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
-  plug Plug.Session, @session_options
+  plug CustomSession
   plug CORSPlug, origin: &Cors.get_cors_origins/0
   plug ElixirWebappWeb.Router
 end

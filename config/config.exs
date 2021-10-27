@@ -23,6 +23,15 @@ config :elixir_webapp, ElixirWebappWeb.Endpoint,
 config :elixir_webapp, :cors_options,
   origin: origin
 
+config :elixir_webapp, :session,
+  store: :cookie,
+  secure: Mix.env() == :prod,
+  key: "_key",
+  signing_salt: "34rEq/FnPW+y4g7oX4+PFWeMxQaIzaj4R+IX/8IbjaUzoiu7JfHXxamNNOv0NRS3",
+  max_age: 3600,
+  http_only: true,
+  same_site: "Strict"
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
